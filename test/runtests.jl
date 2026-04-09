@@ -52,16 +52,16 @@ using Statistics
         # Short series → 0.0
         @test compute_gbm_surprise([100.0, 101.0]) == 0.0
 
-        # Constant prices → 0.0 (zero volatility)
+        # Constant signal → 0.0 (zero volatility)
         @test compute_gbm_surprise(fill(100.0, 10)) == 0.0
 
         # Trending up, last step larger → positive surprise
-        prices_up = [100.0, 101.0, 102.0, 103.0, 110.0]
-        @test compute_gbm_surprise(prices_up) > 0.0
+        signal_up = [100.0, 101.0, 102.0, 103.0, 110.0]
+        @test compute_gbm_surprise(signal_up) > 0.0
 
         # Output always in [-3.0, 3.0]
-        prices = 100.0 .+ cumsum(randn(50))
-        z = compute_gbm_surprise(prices)
+        signal_vals = 100.0 .+ cumsum(randn(50))
+        z = compute_gbm_surprise(signal_vals)
         @test -3.0 ≤ z ≤ 3.0
     end
 

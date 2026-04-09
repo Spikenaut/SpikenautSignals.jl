@@ -18,9 +18,9 @@ for real-time O(1)-update streaming with SNN-compatible output normalization.
 
 ## Features
 
-- `compute_hurst(prices)` — Hurst exponent via R/S analysis → `[0.2, 0.8]`
-- `compute_hawkes(prices)` — Hawkes self-exciting intensity → `[0.5, 3.0]`
-- `compute_gbm_surprise(prices)` — GBM log-return Z-score → `[-3.0, 3.0]`
+- `compute_hurst(signal_values)` — Hurst exponent via R/S analysis → `[0.2, 0.8]`
+- `compute_hawkes(signal_values)` — Hawkes self-exciting intensity → `[0.5, 3.0]`
+- `compute_gbm_surprise(signal_values)` — GBM surprise Z-score → `[-3.0, 3.0]`
 - Graceful fallbacks on short windows (returns neutral values, never errors)
 - Pure Julia stdlib — no external dependencies
 
@@ -36,11 +36,11 @@ Pkg.add("SpikenautSignals")
 ```julia
 using SpikenautSignals
 
-prices = [100.0, 101.2, 99.8, 102.5, 101.0, 103.2]
+signal_values = [100.0, 101.2, 99.8, 102.5, 101.0, 103.2]
 
-h  = compute_hurst(prices)           # 0.5 = random walk, >0.5 = trending
-λ  = compute_hawkes(prices)          # >1.0 = clustering, self-exciting
-z  = compute_gbm_surprise(prices)    # |z| > 2 = anomalous move
+h  = compute_hurst(signal_values)           # 0.5 = random walk, >0.5 = trending
+λ  = compute_hawkes(signal_values)          # >1.0 = clustering, self-exciting
+z  = compute_gbm_surprise(signal_values)    # |z| > 2 = anomalous spike
 
 # Feed directly into SNN encoder
 spikes = encode_for_snn([h, λ, z])
@@ -72,13 +72,11 @@ H = log(R/S) / log(n)    where R = range, S = std dev
 ```
 dS = μS dt + σS dW  →  z = (log(S_t/S_{t-1}) - μ_hat) / σ_hat
 ```
-*Black & Scholes (1973); Itô (1951)*
+*Stochastic diffusion processes; Itô calculus*
 
-## Extracted from Production
+## Signal Processing Pipeline
 
-Extracted from [Eagle-Lander](https://github.com/rmems/Eagle-Lander), a private
-neuromorphic HFT system. The feature extraction pipeline was decoupled from
-market-specific data feeds so it works with any numeric time series.
+Streaming feature extraction pipeline for neuromorphic systems. Works with any numeric time series — hardware telemetry, sensor data, or other signal sources.
 
 ## Part of the Spikenaut Ecosystem
 
